@@ -9,4 +9,4 @@ EXPOSE 3306
 
 # Use CMD instead of ENTRYPOINT so we can override it easily to either
 # debug (via bash) or to pass in default DB/user/password args
-CMD env > /tmp/env && mysqld_safe
+CMD mysqld_safe
