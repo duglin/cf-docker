@@ -1,0 +1,18 @@
+#!/bin/bash
+#set -e
+# Uncomment these if you want to have defaults for people
+#export DOCKER_HOST=${DOCKER_HOST:-tcp://10.80.102.243:2375}
+#export DOCKER_MONITOR=${DOCKER_MONITOR:-http://10.80.102.243:9999}
+export PATH=..:$PATH
+
+cd app 
+env > ../env.lst
+for k in HOME MEMORY_LIMIT NLSPATH OLDPWD PATH PWD SHLVL TMPDIR USER \
+         XFILESEARCHFILE
+do
+  sed -i "/^$k=/d" ../env.lst
+done
+
+echo starting cf-docker
+cf-docker  -v
+sleep 10 # give loggregator time to pick up any error messages

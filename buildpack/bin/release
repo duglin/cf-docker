@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# bin/release <build-dir>
+
+set -e
+
+cat <<EOF
+default_process_types:
+  web: ./dockme
+EOF
+#  web: ./cf-docker
+
+exit 0

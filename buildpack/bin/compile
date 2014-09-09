@@ -1,0 +1,15 @@
+#!/bin/sh
+# bin/compile <build-dir> <cache-dir>
+
+set -e
+BP_DIR=$(dirname $(dirname $(readlink -e $0)))
+
+echo "-----> Building Docker package"
+mkdir $1/../tmpapp
+mv $1/* $1/../tmpapp
+mv $1/../tmpapp $1/app
+cp $BP_DIR/bin/docker $1/
+cp $BP_DIR/bin/cf-docker $1/
+cp $BP_DIR/bin/dockme $1/
+
+exit 0

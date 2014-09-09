@@ -1,0 +1,7 @@
+---
+applications:
+- name: mysql
+  env:
+    DOCKER_HOST: tcp://9.80.102.243:2375
+    DOCKER_MONITOR: http://9.80.102.243:9999
+    # DOCKER_HOST_PORT: 3306
