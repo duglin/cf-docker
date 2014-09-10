@@ -5,6 +5,7 @@ import (
     "encoding/json"
     "errors"
     "flag"
+    "fmt"
     "io/ioutil"
     "log"
     "net"
@@ -43,6 +44,11 @@ func main() {
 
     debug( "DOCKER_HOST=" + dockerHost )
     debug( "DOCKER_MONITOR=" + dockerMonitor )
+
+    if dockerHost == "" {
+      fmt.Println( "DOCKER_HOST must be set" );
+      os.Exit( 1 )
+    }
 
     if os.Getenv( "VCAP_APPLICATION" ) != "" {
         // Running in CF
