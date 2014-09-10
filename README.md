@@ -94,3 +94,4 @@ TODOs & Limitations
 * Allow people to specify which EXPOSEd port to use for the CF app proxy
 * Add ability to pass in Docker "run" options
 * Run cf-docker as a docker app for them so they don't need to start it manually
+* Interactions with Docker are not secured - yet.
