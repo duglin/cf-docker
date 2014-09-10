@@ -41,8 +41,8 @@ func main() {
     dockerHost    = os.Getenv( "DOCKER_HOST" )
     dockerMonitor = os.Getenv( "DOCKER_MONITOR" )
 
-    // debug( "DOCKER_HOST=" + dockerHost )
-    // debug( "DOCKER_MONITOR=" + dockerMonitor )
+    debug( "DOCKER_HOST=" + dockerHost )
+    debug( "DOCKER_MONITOR=" + dockerMonitor )
 
     if os.Getenv( "VCAP_APPLICATION" ) != "" {
         // Running in CF
