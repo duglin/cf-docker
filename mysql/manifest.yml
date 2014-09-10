@@ -2,6 +2,5 @@
 applications:
 - name: mysql
   env:
-    DOCKER_HOST: tcp://9.80.95.175:2375
-    DOCKER_MONITOR: http://9.80.95.175:9999
-    # DOCKER_HOST_PORT: 3306
+    DOCKER_HOST: tcp://192.168.59.147:2375
+    DOCKER_MONITOR: http://192.168.59.147:9999

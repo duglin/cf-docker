@@ -169,7 +169,7 @@ func StartProxy(cid string) {
             go func() { DoProxy( inConn, outConn, &count ) }()
             go func() { DoProxy( outConn, inConn, &count ) }()
             for ; count < 2 ; {
-              time.Sleep( 1000 )
+              time.Sleep( 1*time.Second )
             }
         }()
     }
@@ -181,7 +181,7 @@ func DoProxy(c1 net.Conn, c2 net.Conn, count *int) {
   for { 
     rc,_ := c1.Read( buff )
     if rc < 0 { break }
-    if rc == 0 { time.Sleep( 1000 ) }
+    if rc == 0 { time.Sleep( 1*time.Second ) }
     c2.Write( buff[:rc] )
   }
 }
