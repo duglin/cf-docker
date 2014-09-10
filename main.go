@@ -17,7 +17,7 @@ import (
     "time"
 )
 
-var containers = make( map[string]time.Time )
+var containers = make( map[string]time.Time )   // todo: semaphore
 var verbose    = false
 var port       = 9999 
 var justBuild  = false
@@ -157,7 +157,7 @@ func StartProxy(cid string) {
                 return 
             }
             defer outConn.Close()
-            count := 0
+            count := 0   // todo: semaphore
 
             // There must be a better 'go' way to do this! :-)
             go func() { DoProxy( inConn, outConn, &count ) }()
@@ -204,6 +204,11 @@ func RegisterThread(cid string) {
         //debug( "Registering to:", dockerMonitor + "/register?cid=" + cid )
         resp,err := http.Get( dockerMonitor + "/register?cid=" + cid )
 
+        if resp.StatusCode == 410 {
+          // Docker container is gone, so die to recreate it
+          os.Exit( -1 )
+        }
+
         if err != nil {
             debug( "resp:", resp, "\nerr:", err )
             if resp != nil {
@@ -220,10 +225,19 @@ func doRegister(w http.ResponseWriter, req *http.Request) {
     params,_ := url.ParseQuery( req.URL.RawQuery )
     cid      := params.Get( "cid" )
 
+    data,_ := getContainerInfo( cid )
+    if data == nil {
+        debug( "Can't find container", cid, "so killing CF app" )
+        delete( containers, cid )
+        w.WriteHeader( http.StatusGone )
+        return 
+    }
+
     if containers[cid].IsZero() {
       debug( "Registering:", cid, "(", len(containers)+1, ")" )
     }
     containers[cid] = time.Now()
+    w.WriteHeader( http.StatusOK )
 }
 
 func doDefault(w http.ResponseWriter, req *http.Request) {
@@ -244,7 +258,10 @@ func getJSONfromURL(daURL string) (map[string]interface{},error) {
     var data     map[string]interface{}
     var contents []byte
 
-    resp,err     := http.Get( daURL )
+    resp,err := http.Get( daURL )
+
+    if resp.StatusCode == 404 { return nil, err }
+
     if err != nil {
         debug( "GET " + daURL )
         debug( "GET ERR: ", resp, "->", err )
