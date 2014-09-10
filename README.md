@@ -1,7 +1,9 @@
 Cloud Foundry Docker Buildpack
 ==============================
 
-The Cloud Foundry Docker Buildpack is a buildpack that allows you to deploy Docker applications via the Cloud Foundry interface. This is just a proof-of-concept and therefore has some limitations but does show what the basic user experience might be like if Cloud Foundry supported Docker in a first class way.
+The Cloud Foundry Docker Buildpack is a buildpack that allows you to deploy Docker applications to a Docker host via the Cloud Foundry interface. Any Docker application, not just HTTP webapps, can be deployed using this. While the application is hosted outside of the Cloud Foundry DEAs, the application management aspects of Cloud Foundry (e.g. health manager, scaling, env vars for service binding info) will still be used and available to your Docker-hosted application.
+
+This is just a proof-of-concept and therefore has some limitations but does show what the basic user experience might be like if Cloud Foundry supported Docker in a first class way.
 
 The buildpack requires that you have a Docker host available for it to access, and you need to also have a Docker container manager app (cf-docker) running that will sync your Cloud Foundry runtime with the Docker containers.  If the Docker container manager app is not running then containers will still be created, but they will not be deleted as your app is stopped or scaled down.
 
@@ -90,3 +92,5 @@ TODOs & Limitations
 * Support accessing Docker via REST calls instead of the cmd line so we can remove the embedded docker exe - too little time :-)
 * Support multiple Docker hosts 
 * Allow people to specify which EXPOSEd port to use for the CF app proxy
+* Add ability to pass in Docker "run" options
+* Run cf-docker as a docker app for them so they don't need to start it manually
