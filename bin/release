@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # bin/release <build-dir>
 
 set -e

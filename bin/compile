@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # bin/compile <build-dir> <cache-dir>
 
 set -e
@@ -11,5 +11,12 @@ mv $1/../tmpapp $1/app
 cp $BP_DIR/bin/docker $1/
 cp $BP_DIR/bin/cf-docker $1/
 cp $BP_DIR/bin/dockme $1/
+
+export PATH=$1:$PATH
+cd $1/app
+if [[ ! -e Dockerimage ]]; then
+  echo "Building docker image"
+  cf-docker -v -b
+fi
 
 exit 0

@@ -65,7 +65,7 @@ To ask the buildpack to create a new Docker container based on an existing Docke
 
 Notes
 =====
-Dockfiles that do lots of work may have issues due to the amount of time it'll take for the Docker containers to be built.  To help this along, it would be best if you pre-built them via `docker build` just so things are cached.  Remember, this is just a PoC and if Cloud Foundry supports Docker in a first class way then this can be fixed.
+Dockfiles that do lots of work may have issues due to the amount of time it'll take for the Docker image to be built.  You may need to either increase the CF staging timeout or pre-build the image via a `docker build` so things are cached.
 
 Your Cloud Foundry environment variables (including VCAP_SERVICES) should be available to your Docker containers.
 

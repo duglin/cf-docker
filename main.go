@@ -20,6 +20,7 @@ import (
 var containers = make( map[string]time.Time )
 var verbose    = false
 var port       = 9999 
+var justBuild  = false
 
 var dockerHost    string
 var dockerMonitor string
@@ -34,6 +35,7 @@ func debug(v ...interface{}) bool {
 func main() {
     flag.IntVar( &port, "p", 9999, "Listen port number" )
     flag.BoolVar( &verbose, "v", false, "Turn on debugging output" )
+    flag.BoolVar( &justBuild, "b", false, "Just do docker build step" )
     flag.Parse()
 
     dockerHost    = os.Getenv( "DOCKER_HOST" )
@@ -45,8 +47,10 @@ func main() {
     if os.Getenv( "VCAP_APPLICATION" ) != "" {
         // Running in CF
         cid := StartDockerContainer()
-        go RegisterThread( cid )
-        StartProxy( cid )
+        if !justBuild {
+          go RegisterThread( cid )
+          StartProxy( cid )
+        }
     } else {
         // Running the container monitor
         go DeleteThread()
@@ -65,7 +69,7 @@ func StartDockerContainer() string {
 
     vcapApp := os.Getenv( "VCAP_APPLICATION" )
     json.Unmarshal( []byte(vcapApp), &data )
-    appID := data["application_id"].(string)
+    appID := data["version"].(string)
 
     // Discover the image name or build a new image 
     if imgBytes,err := ioutil.ReadFile( "Dockerimage" ); err == nil {
@@ -73,8 +77,11 @@ func StartDockerContainer() string {
     } else {
         imgName = appID
         Exec( "docker", "build", "-t", imgName, "." )
+        ioutil.WriteFile( "Dockerimage", []byte(imgName), 0600 )
     }
     debug( "ImageName:", imgName )
+
+    if justBuild { return "" }
 
     pOpt := "--publish-all=true"
 
