@@ -6,6 +6,7 @@ import (
     "errors"
     "flag"
     "fmt"
+    "io"
     "io/ioutil"
     "log"
     "net"
@@ -15,6 +16,7 @@ import (
     "os/exec"
     "strconv"
     "strings"
+    "sync"
     "time"
 )
 
@@ -163,27 +165,14 @@ func StartProxy(cid string) {
                 return 
             }
             defer outConn.Close()
-            count := 0   // todo: semaphore
 
-            // There must be a better 'go' way to do this! :-)
-            go func() { DoProxy( inConn, outConn, &count ) }()
-            go func() { DoProxy( outConn, inConn, &count ) }()
-            for ; count < 2 ; {
-              time.Sleep( 1*time.Second )
-            }
+            var w sync.WaitGroup
+            w.Add(2)
+            go func() { defer w.Done(); io.Copy( inConn, outConn ) }()
+            go func() { defer w.Done(); io.Copy( outConn, inConn ) }()
+            w.Wait()
         }()
     }
-}
-
-func DoProxy(c1 net.Conn, c2 net.Conn, count *int) {
-  buff := make( []byte, 4096 )
-  defer func() { *count++ }()
-  for { 
-    rc,_ := c1.Read( buff )
-    if rc < 0 { break }
-    if rc == 0 { time.Sleep( 1*time.Second ) }
-    c2.Write( buff[:rc] )
-  }
 }
 
 func DeleteThread() {
