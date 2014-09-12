@@ -30,7 +30,8 @@ var dockerMonitor string
 
 func debug(v ...interface{}) bool {
     if verbose && v != nil { 
-        log.Println( v... )
+        fmt.Print( time.Now().Format( "2006/01/02 15:04:05 " ) )
+        fmt.Println( v... )
     }
     return verbose
 }
@@ -129,7 +130,9 @@ func StartListener() {
     debug( "Listening on port:", port )
     portStr := strconv.Itoa( port )
     http.HandleFunc( "/register", doRegister ) 
-    log.Println( http.ListenAndServe("0.0.0.0:"+portStr, nil) )
+    if err := http.ListenAndServe("0.0.0.0:"+portStr, nil); err != nil {
+        log.Fatal( err )
+    }
 }
 
 func StartProxy(cid string) {
