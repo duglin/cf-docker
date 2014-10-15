@@ -21,7 +21,7 @@ import (
 )
 
 var containers = make( map[string]time.Time )   // todo: semaphore
-var verbose    = false
+var verbose    = true
 var port       = 9999 
 var justBuild  = false
 
@@ -136,9 +136,15 @@ func StartListener() {
 }
 
 func StartProxy(cid string) {
-    data,_ := getContainerInfo( cid )
-    nets   := data["NetworkSettings"].(map[string]interface{})
-    ports  := nets["Ports"].(map[string]interface{})
+    data,err := getContainerInfo( cid )
+
+    if ( err != nil ) {
+        debug( "Can't get container info(%s): %v", cid, err )
+        return 
+    }
+
+    nets     := data["NetworkSettings"].(map[string]interface{})
+    ports    := nets["Ports"].(map[string]interface{})
 
     var host     string
     var hostPort string 
@@ -265,7 +271,15 @@ func getJSONfromURL(daURL string) (map[string]interface{},error) {
         debug( "GET ERR: ", resp, "->", err )
     }
     if resp != nil {
-        contents,_ = ioutil.ReadAll(resp.Body)
+        contents,err = ioutil.ReadAll(resp.Body)
+        if ( err != nil ) {
+            debug( "Error reading HTTP body(", resp, "):", err )
+            return nil, err
+        }
+        if ( contents == nil || len(contents) == 0 ) {
+            return nil, 
+                errors.New(fmt.Sprintf("Container metadata is empty: %v",resp))
+        }
         json.Unmarshal( []byte(contents), &data )
     } else {
         return nil, errors.New( "Can't get image info" )
